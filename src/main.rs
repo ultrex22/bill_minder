@@ -66,7 +66,7 @@ fn get_user_input() -> String {
     let mut user_input = String::new();
     let _read_input = io::stdin()
         .read_line(&mut user_input)
-        .expect("Failed to read input");
+        .expect("Failed to read input.");
     user_input
 }
 
@@ -75,11 +75,21 @@ fn add_bill(all_bills: &mut HashMap<String, f64>) {
     println!("<Add> Enter bill name:");
     let name = get_user_input();
     let name = name.trim().to_uppercase().to_string();
-    println!("<Add> Enter bill amount:");
+    if name.len() < 1 {
+        println!("Name must have at least one character, try again.");
+        return;
+    }
 
+    println!("<Add> Enter bill amount:");
     let amount = get_user_input();
-    let amount = amount.trim().parse::<f64>().unwrap();
-    // println!("Name:{} Amount:{:?}", name, amount);
+    let amount = amount.trim().parse::<f64>();
+    let amount = match amount {
+        Ok(f) => f,
+        Err(_) => {
+            println!("Amount must be a dollar amount, try again.");
+            return;
+        }
+    };
     all_bills.insert(name, amount);
     clear_scrn();
 }
