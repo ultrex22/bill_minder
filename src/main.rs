@@ -1,23 +1,3 @@
-// Project 1: Interactive bill manager
-//
-// User stories:
-// * L1: I want to add bills, including the name and amount owed.
-// * L1: I want to view existing bills.
-// * L2: I want to remove bills.
-// * L3: I want to edit existing bills.
-// * L3: I want to go back if I change my mind.
-//
-// Tips:
-// * Use the loop keyword to create an interactive menu.
-// * Each menu choice should be it's own function, so you can work on the
-//   the functionality for that menu in isolation.
-// * A vector is the easiest way to store the bills at level 1, but a
-//   hashmap will be easier to work with at levels 2 and 3.
-// * Create a function just for retrieving user input, and reuse it
-//   throughout your program.
-// * Create your program starting at level 1. Once finished, advance to the
-//   next level.
-
 use ::std::collections::HashMap;
 use clearscreen::ClearScreen;
 use std::io;
@@ -32,7 +12,7 @@ fn menu() {
     loop {
         println!("______________________");
         println!("Main Menu\n");
-        println!("Total Bills: {}", all_bills.len());
+        println!("Total Bills: <{}>", all_bills.len());
         println!("1) Add Bill");
         println!("2) View Bills");
         println!("3) Remove Bill");
@@ -98,14 +78,25 @@ fn view_bills(all_bills: &mut HashMap<String, f64>) {
     clear_scrn();
     println!("______________________");
     println!("Bill Summary");
-    for (k, v) in all_bills {
-        println!("{}, Amount:{},", k, v);
+    if all_bills.len() < 1 {
+        println!("All bills paid!!!");
+        return;
+    } else {
+        for (k, v) in all_bills {
+            println!("{}, Amount:{},", k, v);
+        }
     }
 }
 
 fn remove_bill(all_bills: &mut HashMap<String, f64>) {
     clear_scrn();
     view_bills(&mut all_bills.clone());
+    if all_bills.len() < 1 {
+        println!("No bills to remove! Great job!");
+        return
+    }
+    
+
     let (answer, name) = select_bill(all_bills);
     if answer == "y" {
         all_bills.remove(&name);
@@ -120,13 +111,28 @@ fn remove_bill(all_bills: &mut HashMap<String, f64>) {
 fn edit_bill(all_bills: &mut HashMap<String, f64>) {
     clear_scrn();
     view_bills(all_bills);
+    if all_bills.len() < 1 {
+        println!("No bills to edit! Great job!");
+        return
+    }
+
     let (answer, name) = select_bill(all_bills);
     if answer == "y" {
         println!("Enter the new amount: ");
         let new_amount = get_user_input();
-        let new_amount = new_amount.trim().parse::<f64>().unwrap();
-        all_bills.insert(name.clone(), new_amount);
-        println!("{name} updated to {new_amount}");
+
+        match new_amount.trim().parse::<f64>() {
+            Ok(f) => {
+                let new_amount = f;
+                all_bills.insert(name.clone(), new_amount);
+                println!("{name} updated to {new_amount}");
+            }
+            Err(_) => {
+                println!(
+                    "Could not convert input to dollar amount, try again.",);
+                ()
+            }
+        }
     } else {
         clear_scrn();
         println!("<Remove> Try again...");
@@ -138,9 +144,14 @@ fn select_bill(all_bills: &mut HashMap<String, f64>) -> (String, String) {
     let bill_to_edit = get_user_input();
     let bill_to_edit = bill_to_edit.trim().to_uppercase().to_string();
     let clone_all_bills = &mut all_bills.clone();
-    let (name, price) = clone_all_bills.get_key_value(&bill_to_edit).unwrap();
-    println!("Is this the bill? (y/n):  Bill: {}, {}", name, price);
-    let answer = get_user_input();
-    let answer = answer.trim().to_lowercase().to_string();
-    (answer, name.clone())
+    match clone_all_bills.get_key_value(&bill_to_edit) {
+        Some(s) => {
+            let (name, price) = s;
+            println!("Is this the bill? (y/n):  Bill: {}, {}", name, price);
+            let answer = get_user_input();
+            let answer = answer.trim().to_lowercase().to_string();
+            (answer, name.clone())
+        }
+        None => return ("n".to_string(), "None".to_string()),
+    }
 }
