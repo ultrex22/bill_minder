@@ -1,25 +1,28 @@
+//! A simple CLI based bill manager.
+
 use ::std::collections::HashMap;
-use clearscreen::ClearScreen;
-use std::io;
+use bill_minder::*;
 
 fn main() {
     menu();
+   
 }
 
+/// Main menu and loop for the app.
 fn menu() {
     let mut all_bills = HashMap::new();
     clear_scrn();
     loop {
         println!("______________________");
-        println!("Main Menu\n");
-        println!("Total Bills: <{}>", all_bills.len());
+        println!("<< Bill Minder >>");
+        println!("Total Bills: {}\n", all_bills.len());
         println!("1) Add Bill");
         println!("2) View Bills");
         println!("3) Remove Bill");
         println!("4) Edit Bill");
         println!("0) Quit");
         println!("______________________");
-        println!("Select an option: ");
+        println!("Select an option\nthen ENTER: ");
         let choice = get_user_input();
         let choice = choice.trim();
         match choice {
@@ -36,19 +39,6 @@ fn menu() {
     }
 }
 
-fn clear_scrn() {
-    ClearScreen::default()
-        .clear()
-        .expect("Screen clearing failed.");
-}
-
-fn get_user_input() -> String {
-    let mut user_input = String::new();
-    let _read_input = io::stdin()
-        .read_line(&mut user_input)
-        .expect("Failed to read input.");
-    user_input
-}
 
 fn add_bill(all_bills: &mut HashMap<String, f64>) {
     clear_scrn();
@@ -139,19 +129,3 @@ fn edit_bill(all_bills: &mut HashMap<String, f64>) {
     }
 }
 
-fn select_bill(all_bills: &mut HashMap<String, f64>) -> (String, String) {
-    println!("\nSelect the bill you need: ");
-    let bill_to_edit = get_user_input();
-    let bill_to_edit = bill_to_edit.trim().to_uppercase().to_string();
-    let clone_all_bills = &mut all_bills.clone();
-    match clone_all_bills.get_key_value(&bill_to_edit) {
-        Some(s) => {
-            let (name, price) = s;
-            println!("Is this the bill? (y/n):  Bill: {}, {}", name, price);
-            let answer = get_user_input();
-            let answer = answer.trim().to_lowercase().to_string();
-            (answer, name.clone())
-        }
-        None => return ("n".to_string(), "None".to_string()),
-    }
-}
