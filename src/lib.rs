@@ -1,5 +1,7 @@
 
 
+pub mod sql;
+
 use ::std::collections::HashMap;
 use clearscreen::ClearScreen;
 use std::io;

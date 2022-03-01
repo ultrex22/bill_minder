@@ -1,16 +1,30 @@
 //! A simple CLI based bill manager.
 
 use ::std::collections::HashMap;
-use bill_minder::*;
+use bill_minder::{*, sql};
+
 
 fn main() {
-    menu();
-   
+    let mut all_bills = HashMap::new();
+
+    match sql::create_db() {
+        Ok(i) => i,
+        Err(e) => println!("Error creating DB: {}", e)
+    }
+    match sql::load_db(&mut all_bills) {
+        Err(e) => println!("Error loading DB: {}", e),
+        Ok(ok) => ok
+    }
+
+    menu(&mut all_bills);
+    match sql::save_db(&mut all_bills) {
+        Err(e) => println!("Error saving DB: {}", e),
+        Ok(ok) => ok
+    }
 }
 
 /// Main menu and loop for the app.
-fn menu() {
-    let mut all_bills = HashMap::new();
+fn menu(all_bills: &mut HashMap<String, f64>) {
     clear_scrn();
     loop {
         println!("______________________");
@@ -27,10 +41,10 @@ fn menu() {
         let choice = choice.trim();
         match choice {
             "0" => break,
-            "1" => add_bill(&mut all_bills),
-            "2" => view_bills(&mut all_bills),
-            "3" => remove_bill(&mut all_bills),
-            "4" => edit_bill(&mut all_bills),
+            "1" => add_bill(all_bills),
+            "2" => view_bills(all_bills),
+            "3" => remove_bill(all_bills),
+            "4" => edit_bill(all_bills),
             _x => {
                 clear_scrn();
                 continue;
@@ -83,9 +97,9 @@ fn remove_bill(all_bills: &mut HashMap<String, f64>) {
     view_bills(&mut all_bills.clone());
     if all_bills.len() < 1 {
         println!("No bills to remove! Great job!");
-        return
+        return;
     }
-    
+
 
     let (answer, name) = select_bill(all_bills);
     if answer == "y" {
@@ -103,7 +117,7 @@ fn edit_bill(all_bills: &mut HashMap<String, f64>) {
     view_bills(all_bills);
     if all_bills.len() < 1 {
         println!("No bills to edit! Great job!");
-        return
+        return;
     }
 
     let (answer, name) = select_bill(all_bills);
@@ -119,7 +133,7 @@ fn edit_bill(all_bills: &mut HashMap<String, f64>) {
             }
             Err(_) => {
                 println!(
-                    "Could not convert input to dollar amount, try again.",);
+                    "Could not convert input to dollar amount, try again.", );
                 ()
             }
         }

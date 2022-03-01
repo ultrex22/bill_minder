@@ -7,4 +7,6 @@ edition = "2021"
 
 [dependencies]
 clearscreen = "1.0.9"
-rusqlite = "0.26.3"
+[dependencies.rusqlite]
+version = "0.26.0"
+features = ["bundled"]
