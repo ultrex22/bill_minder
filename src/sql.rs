@@ -23,7 +23,7 @@ pub fn load_db(all_bills: &mut HashMap<String, f64>) -> Result<(), Error> {
     let conn = Connection::open("bills.db")?;
     //println!("Connected to db...");
     let mut stmt = conn.prepare("SELECT name, amount FROM bills")?;
-    //println!("conn.prepare executed...");
+    println!("loading DB...");
 
     let res = stmt.query_map([], |row| {
         let name = row.get(0)?;
@@ -48,12 +48,12 @@ pub fn save_db(all_bills: &mut HashMap<String, f64>) -> Result<(), Error> {
 // add error control here....>
     let conn = Connection::open("bills.db")?;
     for (name, amount) in all_bills {
-        let amount = amount.clone();
+        let amount = *amount; //was .clone()
         conn.execute(
             "INSERT INTO bills (name, amount) VALUES (?1, ?2)",
             params![name, amount],
         )?;
-        println!("Current Bill Name: {},  Amount{}", name, amount)
+        //println!("Current Bill Name: {},  Amount{}", name, amount)
     }
     Ok(())
 }

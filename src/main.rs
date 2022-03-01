@@ -59,7 +59,7 @@ fn add_bill(all_bills: &mut HashMap<String, f64>) {
     println!("<Add> Enter bill name:");
     let name = get_user_input();
     let name = name.trim().to_uppercase().to_string();
-    if name.len() < 1 {
+    if name.is_empty() {
         println!("Name must have at least one character, try again.");
         return;
     }
@@ -82,9 +82,9 @@ fn view_bills(all_bills: &mut HashMap<String, f64>) {
     clear_scrn();
     println!("______________________");
     println!("Bill Summary");
-    if all_bills.len() < 1 {
+    if all_bills.is_empty() {
         println!("All bills paid!!!");
-        return;
+        //return;
     } else {
         for (k, v) in all_bills {
             println!("{}, Amount:{},", k, v);
@@ -95,7 +95,7 @@ fn view_bills(all_bills: &mut HashMap<String, f64>) {
 fn remove_bill(all_bills: &mut HashMap<String, f64>) {
     clear_scrn();
     view_bills(&mut all_bills.clone());
-    if all_bills.len() < 1 {
+    if all_bills.is_empty() {
         println!("No bills to remove! Great job!");
         return;
     }
@@ -115,7 +115,7 @@ fn remove_bill(all_bills: &mut HashMap<String, f64>) {
 fn edit_bill(all_bills: &mut HashMap<String, f64>) {
     clear_scrn();
     view_bills(all_bills);
-    if all_bills.len() < 1 {
+    if all_bills.is_empty() {
         println!("No bills to edit! Great job!");
         return;
     }
@@ -134,7 +134,7 @@ fn edit_bill(all_bills: &mut HashMap<String, f64>) {
             Err(_) => {
                 println!(
                     "Could not convert input to dollar amount, try again.", );
-                ()
+                //()
             }
         }
     } else {
